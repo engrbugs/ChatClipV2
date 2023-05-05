@@ -78,13 +78,24 @@ class Program
            IntPtr hInstance,
            IntPtr lpParam);
 
-    void ThreadTask()
+    private static void checkClipboardUpdateThread(Object state)
     {
-        IntPtr hwnd = CreateWindowEx(0, "STATIC", "", 0, 0, 0, 0, 0, HWND_MESSAGE, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+        if (check_clipboardupdate())
+        {
+            Console.WriteLine("CLIPBOARD CHANGED");
+        }
     }
 
+    //void ThreadTask()
+    //{
+    //    IntPtr hwnd = CreateWindowEx(0, "STATIC", "", 0, 0, 0, 0, 0, HWND_MESSAGE, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+    //}
+    [DllImport("CLIPBOARDUPDATE.dll", CallingConvention = CallingConvention.Cdecl)]
+    public static extern bool check_clipboardupdate();
     static void Main(string[] args)
     {
+
+        Console.WriteLine(check_clipboardupdate());
         Console.WriteLine("List of commands: " + VER);
         for (int i = 1; i <= 9; ++i)
         {
@@ -124,6 +135,10 @@ class Program
         //Thread trd = new Thread(new ThreadStart(ThreadTask));
         //trd.IsBackground = true;
         //trd.Start();
+
+
+        // Create a timer that calls check_clipboardupdate every 1 second
+        Timer clipboardTimer = new Timer(new TimerCallback(checkClipboardUpdateThread), null, 0, 1000);
 
 
         while (!triggers.Contains(input_str))
