@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace ChatClipV2;
+namespace ClipboardUpdate;
 class clipboard_update
 {
     [DllImport("user32.dll")]

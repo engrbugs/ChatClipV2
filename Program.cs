@@ -7,17 +7,16 @@ using System.Threading;
 using iniFileIO;
 using System.IO;
 using System.Runtime.InteropServices;
-using static ChatClipV2.clipboard_update;
-
+using ClipboardUpdate;
+using clipboardIO;
 
 
 namespace ChatClipV2;
 
-
 class Program
 {
     bool stop_output_thread = false;
-    int clipBoards_index;
+    int clipBoards_index = 0;
 
     static List<string> prompt_Lines = new List<string>();
     static List<int> before_Locs = new List<int>();
@@ -33,23 +32,9 @@ class Program
     {
         int pos = str.IndexOf(CONST.COMMENT_SYMBOL);
         if (pos != -1)
-        {
-            return trim_Both_Ends(str.Substring(0, pos));
-        }
+            return str.Substring(0, pos).Trim();
         else
-        {
-            return trim_Both_Ends(str);
-        }
-    }
-
-    private static string trim_Both_Ends(string str)
-    {
-        return str.Trim();
-    }
-
-    static string read_Text_file(string filePath)
-    {
-        return File.ReadAllText(filePath);
+            return str.Trim();
     }
 
     private static void checkClipboardUpdateThread(Object state)
@@ -58,15 +43,18 @@ class Program
         {
             if (clipboard_update.check_clipboardupdate())
             {
-                Console.WriteLine("CLIPBOARD CHANGED");
+                Console.WriteLine("Clipboard changed.");
+                clipboard.SetClipboardText("hello world " + clipboard.GetClipboardText());
+                Console.Write(CONST.CONSOLE_MAIN_NAME);
+
                 Thread.Sleep(1000);
             }
         }
     }
 
+
     static void Main(string[] args)
     {
-
         Console.WriteLine("List of commands: " + CONST.VER);
         for (int i = 1; i <= 9; ++i)
         {
@@ -76,8 +64,8 @@ class Program
             str = iniFIle.Read(ExePath() + CONST.FILES_TO_READ, "Files", i.ToString());
             if (!string.IsNullOrEmpty(str))
             {
-                prompt_Lines.Add(read_Text_file(ExePath() + "\\" +
-                    remove_Comment_Section(str)));
+                prompt_Lines.Add(File.ReadAllText((ExePath() + "\\" +
+                    remove_Comment_Section(str))));
             }
 
             // read for [Before] category 
@@ -106,14 +94,14 @@ class Program
 
         while (!triggers.Contains(input_str))
         {
-            Console.Write("main: ");
+            Console.Write(CONST.CONSOLE_MAIN_NAME);
             input_str = Console.ReadLine();
         }
 
         // Stop the clipboard monitoring thread
         //stop_output_thread = true;
 
-        //t.Join();
+        t.Join();
 
         return;
     }

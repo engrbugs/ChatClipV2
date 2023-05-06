@@ -6,7 +6,8 @@
 
     public static Dictionary<string, string[]> COMMANDS = new Dictionary<string, string[]>()
     {
-        {"Cover Letter", new string[] {"cover", "c"}},
+        {"Revert", new string[] {"revert", "r"}},
         {"Exit", new string[] {"exit", "x"}}
     };
+    public const string CONSOLE_MAIN_NAME = "main: ";
 }
