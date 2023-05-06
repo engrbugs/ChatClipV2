@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-class Program
+namespace ChatClipV2;
+class clipboard_update
 {
     [DllImport("user32.dll")]
     static extern IntPtr CreateWindowEx(
@@ -31,13 +32,13 @@ class Program
     const int WM_CLIPBOARDUPDATE = 0x031D;
     static IntPtr HWND_MESSAGE = new IntPtr(-3);
 
-    static void Main()
-    {
-        bool result = check_clipboardupdate();
-        Console.WriteLine(result ? "Clipboard updated!" : "Failed to detect clipboard update.");
-    }
+    //static void Main()
+    //{
+    //    bool result = check_clipboardupdate();
+    //    Console.WriteLine(result ? "Clipboard updated!" : "Failed to detect clipboard update.");
+    //}
 
-    static bool check_clipboardupdate()
+    public static bool check_clipboardupdate()
     {
         IntPtr hwnd = CreateWindowEx(0, "STATIC", "", 0, 0, 0, 0, 0, HWND_MESSAGE, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
 

@@ -7,12 +7,15 @@ using System.Threading;
 using iniFileIO;
 using System.IO;
 using System.Runtime.InteropServices;
+using static ChatClipV2.clipboard_update;
+
+
 
 namespace ChatClipV2;
 
+
 class Program
 {
-
     bool stop_output_thread = false;
     int clipBoards_index;
 
@@ -20,25 +23,15 @@ class Program
     static List<int> before_Locs = new List<int>();
     static List<string> clipBoards = new List<string>();
 
-    static Dictionary<string, string[]> COMMANDS = new Dictionary<string, string[]>()
-    {
-        {"Cover Letter", new string[] {"cover", "c"}},
-        {"Exit", new string[] {"exit", "x"}}
-    };
-
-    const string VER = "0.6b";
-    const string COMMENT_SYMBOL = "//"; // in ini files
-    const string FILES_TO_READ = "\\files.ini";
-
-
     static string ExePath()
     {
-        return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+        return Path.GetDirectoryName(
+            System.Reflection.Assembly.GetExecutingAssembly().Location);
     }
 
     public static string remove_Comment_Section(string str)
     {
-        int pos = str.IndexOf(COMMENT_SYMBOL);
+        int pos = str.IndexOf(CONST.COMMENT_SYMBOL);
         if (pos != -1)
         {
             return trim_Both_Ends(str.Substring(0, pos));
@@ -58,52 +51,29 @@ class Program
     {
         return File.ReadAllText(filePath);
     }
-    /// <summary>
-    /// Places the given window in the system-maintained clipboard format listener list.
-    /// </summary>
-    delegate IntPtr WndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam);
-    [DllImport("user32.dll", SetLastError = true, EntryPoint = "CreateWindowEx")]
-    public static extern IntPtr CreateWindowEx(
-           int dwExStyle,
-           UInt16 regResult,
-           //string lpClassName,
-           string lpWindowName,
-           UInt32 dwStyle,
-           int x,
-           int y,
-           int nWidth,
-           int nHeight,
-           IntPtr hWndParent,
-           IntPtr hMenu,
-           IntPtr hInstance,
-           IntPtr lpParam);
 
     private static void checkClipboardUpdateThread(Object state)
     {
-        if (check_clipboardupdate())
+        while (true)
         {
-            Console.WriteLine("CLIPBOARD CHANGED");
+            if (clipboard_update.check_clipboardupdate())
+            {
+                Console.WriteLine("CLIPBOARD CHANGED");
+                Thread.Sleep(1000);
+            }
         }
     }
 
-    //void ThreadTask()
-    //{
-    //    IntPtr hwnd = CreateWindowEx(0, "STATIC", "", 0, 0, 0, 0, 0, HWND_MESSAGE, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
-    //}
-    [DllImport("CLIPBOARDUPDATE.dll", CallingConvention = CallingConvention.Cdecl)]
-    public static extern bool check_clipboardupdate();
     static void Main(string[] args)
     {
 
-        Console.WriteLine(check_clipboardupdate());
-        Console.WriteLine("List of commands: " + VER);
+        Console.WriteLine("List of commands: " + CONST.VER);
         for (int i = 1; i <= 9; ++i)
         {
             string str = "";
 
             // read for [Files] category 
-
-            str = iniFIle.Read(ExePath() + FILES_TO_READ, "Files", i.ToString());
+            str = iniFIle.Read(ExePath() + CONST.FILES_TO_READ, "Files", i.ToString());
             if (!string.IsNullOrEmpty(str))
             {
                 prompt_Lines.Add(read_Text_file(ExePath() + "\\" +
@@ -111,7 +81,7 @@ class Program
             }
 
             // read for [Before] category 
-            str = iniFIle.Read(ExePath() + FILES_TO_READ, "Before", i.ToString());
+            str = iniFIle.Read(ExePath() + CONST.FILES_TO_READ, "Before", i.ToString());
             if (!string.IsNullOrEmpty(str))
             {
                 //  minus 1 because i'm using zero-indexed but my ini file is in one-based
@@ -121,7 +91,7 @@ class Program
         }
 
         List<string> triggers = new List<string>();
-        foreach (KeyValuePair<string, string[]> x in COMMANDS)
+        foreach (KeyValuePair<string, string[]> x in CONST.COMMANDS)
         {
             Console.WriteLine(x.Key + ": [" + x.Value[1] + "]" + x.Value[0]);
             triggers.Add(x.Value[0]);
@@ -130,16 +100,9 @@ class Program
 
         string? input_str = "";
 
-        ////Thread t = new Thread(output_thread);
-        ////t.Start();
-        //Thread trd = new Thread(new ThreadStart(ThreadTask));
-        //trd.IsBackground = true;
-        //trd.Start();
-
-
-        // Create a timer that calls check_clipboardupdate every 1 second
-        Timer clipboardTimer = new Timer(new TimerCallback(checkClipboardUpdateThread), null, 0, 1000);
-
+        Thread t = new Thread(checkClipboardUpdateThread);
+        t.IsBackground = true;
+        t.Start();
 
         while (!triggers.Contains(input_str))
         {
