@@ -11,28 +11,28 @@ namespace clipboardIO
     class clipboard
     {
         [DllImport("user32.dll")]
-        public static extern bool OpenClipboard(IntPtr hWndNewOwner);
+        private static extern bool OpenClipboard(IntPtr hWndNewOwner);
 
         [DllImport("user32.dll")]
-        public static extern IntPtr GetClipboardData(uint uFormat);
+        private static extern IntPtr GetClipboardData(uint uFormat);
 
         [DllImport("user32.dll")]
-        public static extern bool CloseClipboard();
+        private static extern bool CloseClipboard();
 
         [DllImport("kernel32.dll")]
-        public static extern IntPtr GlobalLock(IntPtr hMem);
+        private static extern IntPtr GlobalLock(IntPtr hMem);
 
         [DllImport("kernel32.dll")]
-        public static extern bool GlobalUnlock(IntPtr hMem);
+        private static extern bool GlobalUnlock(IntPtr hMem);
 
         [DllImport("user32.dll")]
-        public static extern bool EmptyClipboard();
+        private static extern bool EmptyClipboard();
 
         [DllImport("kernel32.dll")]
-        public static extern IntPtr GlobalAlloc(uint uFlags, UIntPtr dwBytes);
+        private static extern IntPtr GlobalAlloc(uint uFlags, UIntPtr dwBytes);
 
         [DllImport("user32.dll")]
-        public static extern IntPtr SetClipboardData(uint uFormat, IntPtr hMem);
+        private static extern IntPtr SetClipboardData(uint uFormat, IntPtr hMem);
 
 
         public static string GetClipboardText()
