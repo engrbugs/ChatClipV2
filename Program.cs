@@ -2,57 +2,12 @@
 using ClipboardUpdate;
 using iniFileIO;
 using PDFIO;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+
 
 namespace ChatClipV2;
 
-class Reader
-{
-    private static Thread inputThread;
-    private static AutoResetEvent getInput, gotInput;
-    private static string input;
-    private static bool stopFlag = false;
-
-
-    static Reader()
-    {
-        getInput = new AutoResetEvent(false);
-        gotInput = new AutoResetEvent(false);
-        inputThread = new Thread(reader);
-        inputThread.IsBackground = true;
-        inputThread.Start();
-    }
-
-    private static void reader()
-    {
-        while (true)
-        {
-            getInput.WaitOne();
-            input = Console.ReadLine();
-            gotInput.Set();
-        }
-    }
-
-    // omit the parameter to read a line without a timeout
-    public static string ReadLine()
-    {
-        bool success = false;
-        getInput.Set();
-        while (!stopFlag && !success)
-        {
-             success = gotInput.WaitOne(1000);
-        }
-        if (success)
-            return input;
-        else
-            throw new TimeoutException("User did not provide input within the timelimit.");
-    }
-    public static void StopReading()
-    {
-        stopFlag = true;
-        getInput.Set();
-    }
-}
 
 class Program
 {
@@ -97,14 +52,10 @@ class Program
         clipboard.SetClipboardText(prompt);
         Console.WriteLine($"Prompt saved in clipboard.");
 
-        Reader.StopReading();
-
     }
 
     private static void checkClipboardUpdateThread(Object state)
     {
-
-
         while (clipBoards_index != clipBoards.Count)
         {
             if (exit_called)
@@ -126,6 +77,9 @@ class Program
         {
             exit_called = true;
             create_a_Prompt();
+            ask_for_cover();
+
+
         }
 
     }
@@ -134,15 +88,18 @@ class Program
     {
         clipBoards_index--;
     }
-    private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
+
+    static bool ask_cover_phase = false;
+    static void ask_for_cover()
     {
-        //e.Cancel = true; // cancel the Ctrl+C key press event
-        exit_called = true; // set the input string to "x" to exit the loop that reads from the console
+        ask_cover_phase = true;
+        // ask if want to create a PDF
+        Console.Write("Do you want to create and overwrite PDF on path, before exit? [Y yes* or N X no]: ");
+
     }
 
     static void Main(string[] args)
     {
-        createPDF.create_PDF("hello");
         Console.WriteLine("List of commands: " + CONST.VER);
         for (int i = 1; i <= 9; ++i)
         {
@@ -183,50 +140,40 @@ class Program
         Thread t = new Thread(checkClipboardUpdateThread);
         t.IsBackground = true;
         t.Start();
-        
-        while (input_str != "x" && input_str != "exit" && exit_called != true)
+
+
+        while (input_str != "x" && input_str != "exit")
         {
-            if (input_str == "revert")
+            if (input_str.ToLower().Trim() == "" ||
+            input_str.ToLower().Trim() == "y" ||
+            input_str.ToLower().Trim() == "yes" && ask_cover_phase)
+            {
+                createPDF.create_PDF("hello");
+            }
+            else if (input_str == "revert")
             {
                 revert();
                 Console.WriteLine($"Index reduced ({clipBoards_index}/{clipBoards.Count}).");
             }
+            
 
-            try
-            {
-                Console.Write(CONST.CONSOLE_MAIN_NAME);
-                input_str = Reader.ReadLine().Trim().ToLower();
-            }
-            catch (TimeoutException e)
-            {
-                // Handle the timeout exception here...
-            }
-            catch (Exception e)
-            {
-                // Handle any other exceptions here...
-            }
+
+            Console.Write(CONST.CONSOLE_MAIN_NAME);
+            input_str = Console.ReadLine().Trim().ToLower();
 
         }
 
         // Stop the clipboard monitoring thread
         //stop_output_thread = true;
 
-        exit_called = true;
         t.Join(1000);
 
-
-        // ask if want to create a PDF
-        Console.Write("Do you want to create and overwrite PDF on path, before exit? [Y yes* or N X no]: ");
-        string create_pdf = Console.ReadLine().Trim().ToLower();
-
-        if (create_pdf == "" || create_pdf == "y" || create_pdf == "yes")
-        {
-            createPDF.create_PDF("hello");
-        }
+        
+        
 
         return;
     }
-    
+
 }
 
 
