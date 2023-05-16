@@ -13,4 +13,26 @@
         {"Exit", new string[] {"exit", "x"}}
     };
     public const string CONSOLE_MAIN_NAME = "main: ";
+
+    public static readonly List<string> COVER_SALUTATION = new List<string>
+    {
+        "Dear",
+        "To the Recruitment Team,",
+        "To Whom It May Concern,",
+        "To the Hiring Manager,"
+    };
+
+    public static readonly List<string> COVER_CLOSING = new List<string>
+    {
+        "Sincerely,",
+        "Yours sincerely,",
+        "Best regards,",
+        "Kind regards,",
+        "Thank you,",
+        "Respectfully,",
+        "Warm regards,",
+        "Yours truly,"
+    };
+
+
 }

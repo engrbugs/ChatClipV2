@@ -27,7 +27,7 @@ namespace PDFIO;
 internal class createPDF
 
 {
-    public static void create_PDF(string str)
+    public static void create_PDF(string[] paragraphs)
     {
         string head = "Dear Hiring Manager,\r\n";
         string newLine = "\r\n";
@@ -37,11 +37,6 @@ internal class createPDF
         int para_botttom_spacing = 8;
         int para_top_spacing = 0;
 
-        string str1 = "I am excited to apply for the Supply Planner position at Storkcraft. With over three years of experience in Supply and Demand Planning, I have honed my skills in data analytics, attention to detail, and collaboration to ensure an optimal balance between customer service and inventory levels. I believe my experience and skills are a perfect match for this role.";
-        string str2 = "As a former Business Analyst, I have a strong background in analyzing business intelligence data to identify areas for improvement and developing and executing solutions to drive growth and profitability. Moreover, my proficiency in Excel and other data visualization tools like Power Bl and Tableau has helped me create visually appealing reports to help stakeholders understand trends and make informed decisions.";
-        string str3 = "In my current role as a CAD & Revit Technician, I have developed and implemented efficient workflows to reduce project completion time and automate repetitive tasks, resulting in a 20% increase in productivity. My ownership mindset and strong commitment to delivering outstanding results will enable me to work diligently to ensure that Storkcraft remains the manufacturer of choice for new and existing parents.";
-        string str4 = "I am excited to contribute my skills and experience to the Storkcraft team and would be grateful for the opportunity to discuss my qualifications further. Thank you for your time and consideration.";
-
         PdfWriter writer = new PdfWriter(path);
         PdfDocument pdf = new PdfDocument(writer);
         Document document = new Document(pdf);
@@ -50,38 +45,53 @@ internal class createPDF
         FontProgramFactory.CreateFont(@"C:\Windows\Fonts\calibri.ttf");
         PdfFont calibri = PdfFontFactory.CreateFont(fontProgram, PdfEncodings.WINANSI);
 
+
+
+
         document.SetMargins(72, 72, 72, 72);
         document.SetFont(calibri);
         document.SetFontSize(11);
         document.SetTextAlignment(TextAlignment.JUSTIFIED);
 
+        for (int i = 0; i < paragraphs.Length; i++)
+        {
+            paragraphs[i] = paragraphs[i].Trim(); 
+            if (i == 0)
+            {
+                Paragraph para = new Paragraph(head + newLine + paragraphs[i] + newLine)
+                    .SetMarginBottom(8)
+                    .SetMarginTop(0);
+                document.Add(para);
+            }
+            else if (i == paragraphs.Length - 1)
+            {
+                Paragraph para4 = new Paragraph(paragraphs[i] + newLine + bottom)
+                    .SetMarginBottom(8)
+                    .SetMarginTop(0);
 
+                document.Add(para4);
+            }
+            else
+            {
+                Paragraph para2 = new Paragraph(paragraphs[i] + newLine)
+                    .SetMarginBottom(8)
+                    .SetMarginTop(0);
 
-        Paragraph para = new Paragraph(head + newLine + str1 + newLine)
-            .SetMarginBottom(8)
-            .SetMarginTop(0);
-
-        document.Add(para);
-
-        Paragraph para2 = new Paragraph(str2 + newLine)
-            .SetMarginBottom(8)
-            .SetMarginTop(0);
-
-        document.Add(para2);
-
-        Paragraph para3 = new Paragraph(str3 + newLine)
-            .SetMarginBottom(8)
-            .SetMarginTop(0);
-
-        document.Add(para3);
-
-        Paragraph para4 = new Paragraph(str4 + newLine + bottom)
-            .SetMarginBottom(8)
-            .SetMarginTop(0);
-
-        document.Add(para4);
+                document.Add(para2);
+            }
+        }
 
         document.Close();
+
+
+
+
+
+
+
+
+
+
     }
 }
 

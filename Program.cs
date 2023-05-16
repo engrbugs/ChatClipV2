@@ -2,8 +2,6 @@
 using ClipboardUpdate;
 using iniFileIO;
 using PDFIO;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 
 
 namespace ChatClipV2;
@@ -11,7 +9,7 @@ namespace ChatClipV2;
 
 class Program
 {
-    
+
 
     static bool exit_called = false;
     static int clipBoards_index = 0;
@@ -60,7 +58,7 @@ class Program
         {
             if (exit_called)
             {
-                
+
                 // Stop everything and return from the function
                 return;
             }
@@ -78,8 +76,6 @@ class Program
             exit_called = true;
             create_a_Prompt();
             ask_for_cover();
-
-
         }
 
     }
@@ -96,6 +92,28 @@ class Program
         // ask if want to create a PDF
         Console.Write("Do you want to create and overwrite PDF on path, before exit? [Y yes* or N X no]: ");
 
+    }
+    static string[] separated_para(string str)
+    {
+        int startIndex = str.IndexOf("Dear");
+        int nIndex_afterStart = str.IndexOf("\n", startIndex);
+        int endIndex = str.LastIndexOf("Sincerely,");
+        string trimmedText = str.Substring(nIndex_afterStart, endIndex - nIndex_afterStart).Trim();
+        // Console.WriteLine(trimmedText.Trim());
+
+        // Console.WriteLine("#########################################");
+
+        string[] para = trimmedText.Split(new[] { "\n" }, StringSplitOptions.RemoveEmptyEntries);
+        List<string> paraList = new List<string>(para);
+
+        paraList.RemoveAll(s => string.IsNullOrEmpty(s.Trim()));
+
+        para = paraList.ToArray();
+        //foreach (string paragraph in para)
+        //{
+        //    Console.WriteLine(paragraph);
+        //}
+        return para;
     }
 
     static void Main(string[] args)
@@ -144,32 +162,35 @@ class Program
 
         while (input_str != "x" && input_str != "exit")
         {
-            if (input_str.ToLower().Trim() == "" ||
-            input_str.ToLower().Trim() == "y" ||
-            input_str.ToLower().Trim() == "yes" && ask_cover_phase)
+            if (ask_cover_phase)
             {
-                createPDF.create_PDF("hello");
+                break;
             }
             else if (input_str == "revert")
             {
                 revert();
                 Console.WriteLine($"Index reduced ({clipBoards_index}/{clipBoards.Count}).");
             }
-            
-
 
             Console.Write(CONST.CONSOLE_MAIN_NAME);
             input_str = Console.ReadLine().Trim().ToLower();
 
         }
 
-        // Stop the clipboard monitoring thread
-        //stop_output_thread = true;
+        string cover;
+        if (input_str.ToLower().Trim() == "" ||
+        input_str.ToLower().Trim() == "y" ||
+        input_str.ToLower().Trim() == "yes")
+        {
+            Console.Write("Will read on clipboard for the cover context [Press ENTER]");
+            Console.ReadLine();
+            //createPDF.create_PDF("hello");
+            cover = clipboard.GetClipboardText();
+            string[] paras = separated_para(cover);
+            createPDF.create_PDF(paras);
+        }
 
         t.Join(1000);
-
-        
-        
 
         return;
     }
