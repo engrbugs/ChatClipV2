@@ -100,23 +100,21 @@ class Program
 
     static string[] separated_para(string str)
     {
-    int startIndex = 0;
-    foreach (string salutation in CONST.COVER_SALUTATION)
-    {
-        Regex regex = new Regex(salutation);
-        Match match = regex.Match(str);
-
-        if (match.Success)
+        int startIndex = 0;
+        foreach (string salutation in CONST.COVER_SALUTATION)
         {
-            startIndex = match.Index;
-            break; // Break the loop when the first salutation is found
+            Regex regex = new Regex(salutation);
+            Match match = regex.Match(str);
+
+            if (match.Success)
+            {
+                startIndex = match.Index;
+                startIndex = str.IndexOf("\n", startIndex);
+                break; // Break the loop when the first salutation is found
+            }
         }
-    }
 
-    int nIndex_afterStart = str.IndexOf("\n", startIndex);
-
-
-        int endIndex = str.Length();
+        int endIndex = str.Length;
         foreach (string closing in CONST.COVER_CLOSING)
         {
             Regex regex = new Regex(closing);
@@ -130,7 +128,7 @@ class Program
         }
 
 
-        string trimmedText = str.Substring(nIndex_afterStart, endIndex - nIndex_afterStart).Trim();
+        string trimmedText = str.Substring(startIndex, endIndex - startIndex).Trim();
         // Console.WriteLine(trimmedText.Trim());
 
         // Console.WriteLine("#########################################");
