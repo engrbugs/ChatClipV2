@@ -2,6 +2,7 @@
 using ClipboardUpdate;
 using iniFileIO;
 using PDFIO;
+using System.Text.RegularExpressions;
 
 
 namespace ChatClipV2;
@@ -93,11 +94,42 @@ class Program
         Console.Write("Do you want to create and overwrite PDF on path, before exit? [Y yes* or N X no]: ");
 
     }
+
+
+
+
     static string[] separated_para(string str)
     {
-        int startIndex = str.IndexOf("Dear");
-        int nIndex_afterStart = str.IndexOf("\n", startIndex);
-        int endIndex = str.LastIndexOf("Sincerely,");
+    int startIndex = 0;
+    foreach (string salutation in CONST.COVER_SALUTATION)
+    {
+        Regex regex = new Regex(salutation);
+        Match match = regex.Match(str);
+
+        if (match.Success)
+        {
+            startIndex = match.Index;
+            break; // Break the loop when the first salutation is found
+        }
+    }
+
+    int nIndex_afterStart = str.IndexOf("\n", startIndex);
+
+
+        int endIndex = str.Length();
+        foreach (string closing in CONST.COVER_CLOSING)
+        {
+            Regex regex = new Regex(closing);
+            Match match = regex.Match(str);
+
+            if (match.Success)
+            {
+                endIndex = match.Index + match.Length;
+                break; // Break the loop when the first closing is found
+            }
+        }
+
+
         string trimmedText = str.Substring(nIndex_afterStart, endIndex - nIndex_afterStart).Trim();
         // Console.WriteLine(trimmedText.Trim());
 
