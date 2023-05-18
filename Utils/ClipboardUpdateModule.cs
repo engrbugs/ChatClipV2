@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace ClipboardUpdate;
-class clipboard_update
+namespace ChatClipV2.Utils;
+class ClipboardUpdateModule
 {
     [DllImport("user32.dll")]
     static extern IntPtr CreateWindowEx(

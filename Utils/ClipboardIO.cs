@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace clipboardIO
+namespace ChatClipV2.Utils
 {
     class clipboard
     {
@@ -78,7 +78,7 @@ namespace clipboardIO
                 try
                 {
                     EmptyClipboard();
-                    byte[] bytes = System.Text.Encoding.ASCII.GetBytes(str);
+                    byte[] bytes = Encoding.ASCII.GetBytes(str);
                     IntPtr hMem = GlobalAlloc(0x0002 /* GMEM_MOVEABLE */, (UIntPtr)(bytes.Length + 1));
                     if (hMem != IntPtr.Zero)
                     {

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace iniFileIO
+namespace ChatClipV2.Utils
 {
     public class iniFIle
     {
