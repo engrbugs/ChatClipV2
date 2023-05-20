@@ -14,10 +14,9 @@ namespace ChatClipV2
             variable.ask_cover_phase = true;
             // ask if want to create a PDF
             Console.Write("Do you want to create and overwrite PDF on path, before exit? [Y yes* or N X no]: ");
-
         }
 
-        public static string[] SeparateParagraphs(string str)
+        public static string[] ReadCover(string str)
         {
             int startIndex = FindStartIndex(str);
             int endIndex = FindEndIndex(str);

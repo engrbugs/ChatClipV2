@@ -46,7 +46,7 @@ class Program
                 break;
             }
         }
-
+        clipboardThread.Join(1000);
         string cover;
         input = input.ToLower().Trim();
 
@@ -55,11 +55,24 @@ class Program
             Console.Write("Will read the cover context from the clipboard [Press ENTER]");
             Console.ReadLine();
             cover = clipboard.GetClipboardText();
-            string[] paragraphs = CoverManager.SeparateParagraphs(cover);
-            createPDF.CreatePDF(paragraphs);
+            string[] paragraphs = CoverManager.ReadCover(cover);
+
+            DataTypes.SuccessReturn PDFSuccess = new DataTypes.SuccessReturn();
+
+            while (!PDFSuccess) 
+            {
+                PDFSuccess = createPDF.CreatePDF(paragraphs);
+                if (!PDFSuccess)
+                {
+                    Console.Write($"{PDFSuccess.ErrorMessage} [Press ENTER to retry or N NO to exit]");
+                    string? PDFRetryCMD = Console.ReadLine();
+                    if (PDFRetryCMD.ToLower().Trim() == "n" || 
+                        PDFRetryCMD.ToLower().Trim() == "no") break;
+                }
+            } 
         }
 
-        clipboardThread.Join(1000);
+
     }
 
     
